@@ -32,7 +32,7 @@ def run(args,mode = 0):
         return sout
 
 def video2image(videopath, imagepath, fps=0, start_time='00:00:00', last_time='00:00:00'):
-    args = ['ffmpeg']
+    args = ['ffmpeg', 'hwaccels -cuda']
     if last_time != '00:00:00':
         args += ['-ss', start_time]
         args += ['-t', last_time]
@@ -51,7 +51,7 @@ def video2voice(videopath, voicepath, start_time='00:00:00', last_time='00:00:00
     run(args)
 
 def image2video(fps,imagepath,voicepath,videopath):
-    os.system('ffmpeg -y -r '+str(fps)+' -i '+imagepath+' -vcodec libx264 '+os.path.split(voicepath)[0]+'/video_tmp.mp4')
+    os.system('ffmpeg -y -r '+str(fps)+' -i '+imagepath+' -vcodec nvenc_h264 '+os.path.split(voicepath)[0]+'/video_tmp.mp4')
     os.system('ffmpeg -i '+os.path.split(voicepath)[0]+'/video_tmp.mp4'+' -i "'+voicepath+'" -vcodec copy -acodec aac '+videopath)
 
 def get_video_infos(videopath):
@@ -75,9 +75,9 @@ def cut_video(in_path,start_time,last_time,out_path,vcodec='h265'):
     if vcodec == 'copy':
         os.system('ffmpeg -ss '+start_time+' -t '+last_time+' -i "'+in_path+'" -vcodec copy -acodec copy '+out_path)
     elif vcodec == 'h264':    
-        os.system('ffmpeg -ss '+start_time+' -t '+last_time+' -i "'+in_path+'" -vcodec libx264 -b 12M '+out_path)
+        os.system('ffmpeg -ss '+start_time+' -t '+last_time+' -i "'+in_path+'" -vcodec nvenc_h264 -b 12M '+out_path)
     elif vcodec == 'h265':
-        os.system('ffmpeg -ss '+start_time+' -t '+last_time+' -i "'+in_path+'" -vcodec libx265 -b 12M '+out_path)
+        os.system('ffmpeg -ss '+start_time+' -t '+last_time+' -i "'+in_path+'" -vcodec nvenc_hevc -b 12M '+out_path)
 
 def continuous_screenshot(videopath,savedir,fps):
     '''
